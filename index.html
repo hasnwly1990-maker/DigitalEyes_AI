@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Mubasher | رفيقك الذكي في رحلة الإيمان</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- FontAwesome 6 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  
+  <!-- Google Fonts: Tajawal -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            tajawal: ['Tajawal', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              navy: '#0B192C',
+              dark: '#1E293B',
+              emerald: '#059669',
+              'emerald-light': '#10B981',
+              'emerald-soft': '#ECFDF5',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body {
+      font-family: 'Tajawal', sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+    
+    /* Blinking typing cursor */
+    .typing-cursor::after {
+      content: '|';
+      display: inline-block;
+      margin-inline-start: 4px;
+      color: #059669;
+      font-weight: 900;
+      animation: blink 0.9s infinite;
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0; }
+    }
+
+    /* Subtle viewfinder overlay lines */
+    .camera-crosshair {
+      background: radial-gradient(circle, transparent 65%, rgba(0, 0, 0, 0.4) 100%);
+    }
+
+    /* Sound wave pulse animation */
+    @keyframes wave {
+      0%, 100% { height: 6px; }
+      50% { height: 22px; }
+    }
+    .wave-bar {
+      animation: wave 1.2s ease-in-out infinite;
+    }
+    .wave-bar:nth-child(2) { animation-delay: 0.2s; }
+    .wave-bar:nth-child(3) { animation-delay: 0.4s; }
+    .wave-bar:nth-child(4) { animation-delay: 0.1s; }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col justify-between selection:bg-emerald-500 selection:text-white">
+
+  <!-- Main Container (Mobile-First / Max Width 480px on desktop) -->
+  <main class="w-full max-w-md mx-auto p-4 sm:p-6 flex flex-col gap-5 flex-grow">
+    
+    <!-- 1. HEADER SECTION -->
+    <header class="text-center pt-2 pb-1" role="banner">
+      <div class="inline-flex items-center justify-center gap-2 mb-2 px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-bold border border-emerald-200">
+        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+        <span>مشروع مبشر الذكي • IoT Assistant</span>
+      </div>
+      <h1 class="text-2xl sm:text-3xl font-extrabold text-[#0B192C] leading-snug tracking-tight">
+        Mubasher <span class="text-emerald-600">|</span> رفيقك الذكي في رحلة الإيمان
+      </h1>
+      <p class="text-xs sm:text-sm text-slate-500 mt-1 font-medium">
+        نظام الإرشاد والمساعدة الذكية لضيوف الرحمن
+      </p>
+    </header>
+
+    <!-- 2. CAMERA STREAM CONTAINER -->
+    <section aria-label="بث الكاميرا المباشر" class="w-full">
+      <div 
+        id="camera-stream-container" 
+        class="relative w-full aspect-[4/3] bg-zinc-900 rounded-2xl overflow-hidden shadow-lg border-2 border-zinc-800 flex items-center justify-center select-none group"
+      >
+        <!-- Top Right Pulsing LIVE Badge -->
+        <div class="absolute top-3.5 right-3.5 z-20 flex items-center gap-2 bg-red-600/90 hover:bg-red-600 backdrop-blur-md px-3 py-1 rounded-full text-white text-xs font-bold tracking-wider shadow-md transition-colors">
+          <span class="relative flex h-2.5 w-2.5">
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+            <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-white"></span>
+          </span>
+          <span>LIVE</span>
+        </div>
+
+        <!-- Camera HUD Indicators (Overlay) -->
+        <div class="absolute inset-0 camera-crosshair pointer-events-none z-10 flex flex-col justify-between p-4">
+          <div class="flex justify-between items-center text-[10px] text-zinc-400 font-mono tracking-widest">
+            <span class="bg-black/40 px-2 py-0.5 rounded backdrop-blur">RES: 1080p</span>
+            <!-- Space for top right badge -->
+            <span class="mr-16"></span>
+          </div>
+
+          <!-- Target Grid Lines in Center -->
+          <div class="self-center flex items-center justify-center opacity-30 text-emerald-400">
+            <i class="fa-solid fa-crosshairs text-4xl"></i>
+          </div>
+
+          <div class="flex justify-between items-center text-[10px] text-zinc-400 font-mono">
+            <span class="flex items-center gap-1.5 bg-black/40 px-2 py-0.5 rounded backdrop-blur">
+              <i class="fa-solid fa-wifi text-emerald-400 text-[9px]"></i> ESP32-CAM
+            </span>
+            <span id="stream-time" class="bg-black/40 px-2 py-0.5 rounded backdrop-blur">00:00:00</span>
+          </div>
+        </div>
+
+        <!-- Placeholder Content in Center -->
+        <div class="text-center px-4 z-10 transform group-hover:scale-105 transition-transform duration-300">
+          <div class="w-14 h-14 mx-auto mb-3 rounded-full bg-zinc-800/80 border border-zinc-700 flex items-center justify-center text-zinc-300 text-2xl shadow-inner">
+            <i class="fa-solid fa-video text-emerald-400"></i>
+          </div>
+          <p class="text-zinc-100 font-bold text-base sm:text-lg">
+            بث الكاميرا المباشر (ESP32-CAM)
+          </p>
+          <p class="text-zinc-400 text-xs mt-1 font-medium">
+            جاري استقبال إشارة الفيديو عبر البروتوكول اللاسلكي
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. AI STATUS PANEL -->
+    <section aria-label="لوحة حالة الذكاء الاصطناعي" class="w-full">
+      <div 
+        id="ai-status-card"
+        class="bg-white rounded-2xl p-5 shadow-md border-2 border-emerald-500/30 transition-all duration-300 hover:border-emerald-500 hover:shadow-emerald-500/10 hover:shadow-lg relative overflow-hidden"
+      >
+        <!-- Ambient Decorative Top Accent Line -->
+        <div class="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-emerald-400 via-teal-500 to-emerald-600"></div>
+
+        <!-- Panel Header: AI Assistant Label & Audio Equalizer Indicator -->
+        <div class="flex items-center justify-between pb-3 border-b border-slate-100 mb-3">
+          <div class="flex items-center gap-2.5">
+            <div class="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center text-sm shadow-sm font-bold">
+              <i class="fa-solid fa-robot"></i>
+            </div>
+            <div>
+              <span class="text-xs font-bold text-emerald-700 uppercase tracking-wide block">المساعد الصوتي الذكي</span>
+              <span class="text-[11px] text-slate-400">توجيه فوري بالذكاء الاصطناعي</span>
+            </div>
+          </div>
+
+          <!-- Sound Wave Visualizer + Speech Toggle -->
+          <div class="flex items-center gap-2">
+            <div id="audio-wave" class="flex items-end gap-0.5 h-6 px-1 opacity-70">
+              <span class="w-1 bg-emerald-500 rounded-full wave-bar"></span>
+              <span class="w-1 bg-emerald-500 rounded-full wave-bar"></span>
+              <span class="w-1 bg-emerald-500 rounded-full wave-bar"></span>
+              <span class="w-1 bg-emerald-500 rounded-full wave-bar"></span>
+            </div>
+            <button 
+              id="voice-toggle-btn"
+              title="تفعيل / كتم الصوت التلقائي"
+              aria-label="تفعيل النطق الصوتي"
+              class="w-8 h-8 rounded-full bg-slate-100 hover:bg-emerald-50 text-slate-600 hover:text-emerald-700 flex items-center justify-center text-xs transition-colors"
+            >
+              <i class="fa-solid fa-volume-high"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- The Status Text Content -->
+        <div class="min-h-[72px] flex items-center">
+          <p 
+            id="ai-status-text" 
+            role="status" 
+            aria-live="polite"
+            class="text-lg sm:text-xl font-bold text-[#0B192C] leading-relaxed transition-all duration-200"
+          >النظام جاهز... بانتظار التحليل الحركي</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. INTERACTIVE CONTROL GRID -->
+    <section aria-label="أدوات التحكم والتوجيه" class="w-full">
+      <h2 class="text-sm font-bold text-slate-500 mb-3 px-1 flex items-center justify-between">
+        <span>أوامر التوجيه والاستشعار</span>
+        <span class="text-xs text-emerald-600 font-medium">اضغط لأي أمر</span>
+      </h2>
+
+      <div class="grid grid-cols-2 gap-3.5 sm:gap-4">
+        <!-- Button 1: رادار بشري ذكي -->
+        <button 
+          id="btn-radar"
+          type="button"
+          class="control-btn group flex flex-col items-center justify-center text-center p-4 sm:p-5 rounded-2xl bg-white border-2 border-slate-200/80 shadow-sm hover:shadow-md hover:border-emerald-500 focus:outline-none focus:ring-4 focus:ring-emerald-500/20 active:scale-95 transition-all duration-200 cursor-pointer"
+        >
+          <div class="w-13 h-13 sm:w-14 sm:h-14 mb-3 rounded-2xl bg-slate-50 text-slate-700 group-hover:bg-emerald-50 group-hover:text-emerald-600 group-focus:bg-emerald-50 group-focus:text-emerald-600 flex items-center justify-center text-2xl transition-all duration-200 shadow-inner">
+            <i class="fa-solid fa-tower-broadcast"></i>
+          </div>
+          <span class="text-sm sm:text-base font-bold text-[#0B192C] group-hover:text-emerald-700 transition-colors">
+            رادار بشري ذكي
+          </span>
+          <span class="text-[11px] text-slate-400 mt-0.5">كشف مسارات الزحام</span>
+        </button>
+
+        <!-- Button 2: تحليل المعالم -->
+        <button 
+          id="btn-landmarks"
+          type="button"
+          class="control-btn group flex flex-col items-center justify-center text-center p-4 sm:p-5 rounded-2xl bg-white border-2 border-slate-200/80 shadow-sm hover:shadow-md hover:border-emerald-500 focus:outline-none focus:ring-4 focus:ring-emerald-500/20 active:scale-95 transition-all duration-200 cursor-pointer"
+        >
+          <div class="w-13 h-13 sm:w-14 sm:h-14 mb-3 rounded-2xl bg-slate-50 text-slate-700 group-hover:bg-emerald-50 group-hover:text-emerald-600 group-focus:bg-emerald-50 group-focus:text-emerald-600 flex items-center justify-center text-2xl transition-all duration-200 shadow-inner">
+            <i class="fa-solid fa-kaaba"></i>
+          </div>
+          <span class="text-sm sm:text-base font-bold text-[#0B192C] group-hover:text-emerald-700 transition-colors">
+            تحليل المعالم
+          </span>
+          <span class="text-[11px] text-slate-400 mt-0.5">التعرف على المشاعر</span>
+        </button>
+
+        <!-- Button 3: منع الضياع -->
+        <button 
+          id="btn-anti-lost"
+          type="button"
+          class="control-btn group flex flex-col items-center justify-center text-center p-4 sm:p-5 rounded-2xl bg-white border-2 border-slate-200/80 shadow-sm hover:shadow-md hover:border-emerald-500 focus:outline-none focus:ring-4 focus:ring-emerald-500/20 active:scale-95 transition-all duration-200 cursor-pointer"
+        >
+          <div class="w-13 h-13 sm:w-14 sm:h-14 mb-3 rounded-2xl bg-slate-50 text-slate-700 group-hover:bg-emerald-50 group-hover:text-emerald-600 group-focus:bg-emerald-50 group-focus:text-emerald-600 flex items-center justify-center text-2xl transition-all duration-200 shadow-inner">
+            <i class="fa-solid fa-users"></i>
+          </div>
+          <span class="text-sm sm:text-base font-bold text-[#0B192C] group-hover:text-emerald-700 transition-colors">
+            منع الضياع
+          </span>
+          <span class="text-[11px] text-slate-400 mt-0.5">تتبع الفوج والمطوف</span>
+        </button>
+
+        <!-- Button 4: التوجيه الصوتي -->
+        <button 
+          id="btn-audio-guide"
+          type="button"
+          class="control-btn group flex flex-col items-center justify-center text-center p-4 sm:p-5 rounded-2xl bg-white border-2 border-slate-200/80 shadow-sm hover:shadow-md hover:border-emerald-500 focus:outline-none focus:ring-4 focus:ring-emerald-500/20 active:scale-95 transition-all duration-200 cursor-pointer"
+        >
+          <div class="w-13 h-13 sm:w-14 sm:h-14 mb-3 rounded-2xl bg-slate-50 text-slate-700 group-hover:bg-emerald-50 group-hover:text-emerald-600 group-focus:bg-emerald-50 group-focus:text-emerald-600 flex items-center justify-center text-2xl transition-all duration-200 shadow-inner">
+            <i class="fa-solid fa-volume-high"></i>
+          </div>
+          <span class="text-sm sm:text-base font-bold text-[#0B192C] group-hover:text-emerald-700 transition-colors">
+            التوجيه الصوتي
+          </span>
+          <span class="text-[11px] text-slate-400 mt-0.5">صوت مكاني ثلاثي الأبعاد</span>
+        </button>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- FOOTER / IOT TELEMETRY STATUS -->
+  <footer class="w-full max-w-md mx-auto px-4 py-3 text-center text-xs text-slate-400 border-t border-slate-200/60 flex items-center justify-between">
+    <div class="flex items-center gap-1.5">
+      <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+      <span class="text-slate-600 font-medium">ESP32 متصل</span>
+    </div>
+    <span>Mubasher AI v1.0</span>
+  </footer>
+
+  <!-- 5. JAVASCRIPT LOGIC -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // DOM Elements
+      const aiStatusText = document.getElementById('ai-status-text');
+      const aiStatusCard = document.getElementById('ai-status-card');
+      const voiceToggleBtn = document.getElementById('voice-toggle-btn');
+      const audioWave = document.getElementById('audio-wave');
+      const streamTime = document.getElementById('stream-time');
+
+      const btnRadar = document.getElementById('btn-radar');
+      const btnLandmarks = document.getElementById('btn-landmarks');
+      const btnAntiLost = document.getElementById('btn-anti-lost');
+      const btnAudioGuide = document.getElementById('btn-audio-guide');
+
+      // State
+      let typingInterval = null;
+      let voiceEnabled = true;
+      let startTime = Date.now();
+
+      // Live Timer Simulation
+      setInterval(() => {
+        const diff = Math.floor((Date.now() - startTime) / 1000);
+        const hours = String(Math.floor(diff / 3600)).padStart(2, '0');
+        const minutes = String(Math.floor((diff % 3600) / 60)).padStart(2, '0');
+        const seconds = String(diff % 60).padStart(2, '0');
+        if (streamTime) streamTime.textContent = `${hours}:${minutes}:${seconds}`;
+      }, 1000);
+
+      // Voice synthesis function (Arabic TTS simulation)
+      function speakText(text) {
+        if (!voiceEnabled || !('speechSynthesis' in window)) return;
+        
+        // Stop any current utterance
+        window.speechSynthesis.cancel();
+
+        const cleanText = text.replace(/<[^>]*>/g, '');
+        const utterance = new SpeechSynthesisUtterance(cleanText);
+        utterance.lang = 'ar-SA';
+        utterance.rate = 0.95; // comfortable rate for pilgrims
+        utterance.pitch = 1.0;
+
+        // Try to pick an Arabic voice if available
+        const voices = window.speechSynthesis.getVoices();
+        const arabicVoice = voices.find(v => v.lang.startsWith('ar'));
+        if (arabicVoice) {
+          utterance.voice = arabicVoice;
+        }
+
+        utterance.onstart = () => {
+          if (audioWave) audioWave.style.opacity = '1';
+        };
+        utterance.onend = () => {
+          if (audioWave) audioWave.style.opacity = '0.4';
+        };
+        utterance.onerror = () => {
+          if (audioWave) audioWave.style.opacity = '0.4';
+        };
+
+        window.speechSynthesis.speak(utterance);
+      }
+
+      // Web Audio Subtle Chime (gives instant sensory IoT feedback)
+      function playChime() {
+        try {
+          const AudioContext = window.AudioContext || window.webkitAudioContext;
+          if (!AudioContext) return;
+          const ctx = new AudioContext();
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(587.33, ctx.currentTime); // D5 note
+          osc.frequency.exponentialRampToValueAtTime(880, ctx.currentTime + 0.12); // A5 note
+
+          gain.gain.setValueAtTime(0.08, ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.25);
+
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+
+          osc.start();
+          osc.stop(ctx.currentTime + 0.25);
+        } catch (e) {
+          // Silent fallback if audio context blocked
+        }
+      }
+
+      // Typing Effect Function
+      function typeWriter(text, speed = 25) {
+        // Clear any ongoing typing
+        if (typingInterval) {
+          clearInterval(typingInterval);
+          typingInterval = null;
+        }
+
+        // Highlight card visually
+        aiStatusCard.classList.add('border-emerald-500', 'ring-2', 'ring-emerald-500/20');
+        setTimeout(() => {
+          aiStatusCard.classList.remove('ring-2', 'ring-emerald-500/20');
+        }, 600);
+
+        // Reset text and add cursor
+        aiStatusText.classList.add('typing-cursor');
+        aiStatusText.textContent = '';
+        
+        let charIndex = 0;
+        playChime();
+        speakText(text);
+
+        typingInterval = setInterval(() => {
+          if (charIndex < text.length) {
+            aiStatusText.textContent += text.charAt(charIndex);
+            charIndex++;
+          } else {
+            clearInterval(typingInterval);
+            typingInterval = null;
+            // Remove cursor after short delay
+            setTimeout(() => {
+              aiStatusText.classList.remove('typing-cursor');
+            }, 1200);
+          }
+        }, speed);
+      }
+
+      // Button Click Handlers & Target Texts
+      const actions = [
+        {
+          btn: btnRadar,
+          text: 'رادار الزحام: يوجد مسار آمن للتقدم على بعد 1 متر يميناً.'
+        },
+        {
+          btn: btnLandmarks,
+          text: 'تحليل المعالم: أنت الآن أمام مقام إبراهيم، المسافة بينك وبينه مترين.'
+        },
+        {
+          btn: btnAntiLost,
+          text: 'منع الضياع: تم رصد المطوف أحمد.. المسافة: 3 أمتار على اليمين.'
+        },
+        {
+          btn: btnAudioGuide,
+          text: 'جاري تفعيل نظام الصوت المكاني ثلاثي الأبعاد...'
+        }
+      ];
+
+      actions.forEach(({ btn, text }) => {
+        if (!btn) return;
+
+        btn.addEventListener('click', () => {
+          // Highlight active button state
+          document.querySelectorAll('.control-btn').forEach(b => {
+            b.classList.remove('border-emerald-600', 'bg-emerald-50/50');
+          });
+          btn.classList.add('border-emerald-600', 'bg-emerald-50/50');
+
+          typeWriter(text);
+        });
+      });
+
+      // Voice Toggle Handler
+      if (voiceToggleBtn) {
+        voiceToggleBtn.addEventListener('click', () => {
+          voiceEnabled = !voiceEnabled;
+          if (!voiceEnabled && 'speechSynthesis' in window) {
+            window.speechSynthesis.cancel();
+          }
+          const icon = voiceToggleBtn.querySelector('i');
+          if (icon) {
+            if (voiceEnabled) {
+              icon.className = 'fa-solid fa-volume-high';
+              voiceToggleBtn.classList.remove('text-red-500');
+              voiceToggleBtn.classList.add('text-slate-600');
+            } else {
+              icon.className = 'fa-solid fa-volume-xmark';
+              voiceToggleBtn.classList.remove('text-slate-600');
+              voiceToggleBtn.classList.add('text-red-500');
+            }
+          }
+        });
+      }
+
+      // Pre-load speech voices
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.onvoiceschanged = () => {
+          window.speechSynthesis.getVoices();
+        };
+      }
+    });
+  </script>
+</body>
+</html>
